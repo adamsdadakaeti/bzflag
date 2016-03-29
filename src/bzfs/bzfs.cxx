@@ -3761,6 +3761,45 @@ static void shotUpdate(int playerIndex, void *buf, int len)
   broadcastMessage(MsgGMUpdate, len, buf);
 }
 
+
+void compensateLag(int playerIndex, int targetPlayer, FiringInfo &firingInfo) {
+  GameKeeper::Player *playerData
+    = GameKeeper::Player::getPlayerByIndex(playerIndex);
+    char message[MessageLen];
+    const ShotUpdate &shot = firingInfo.shot;
+    float synctime = BZDB.eval(StateDatabase::BZDB_LAGCOMPENSATIONVAR);
+    bool lcDebug = BZDB.isTrue("_lagCompensationDebug");
+    // for (int i = 0; i < curMaxPlayers; i++) {
+    if (realPlayerWithNet(targetPlayer)) {
+    GameKeeper::Player *pData
+    = GameKeeper::Player::getPlayerByIndex(targetPlayer);
+    int l1 = pData->lagInfo.getLag();
+    int l2;
+    if (playerIndex == ServerPlayer)
+    {
+      l2 = 0;
+    } else {
+      l2 = playerData->lagInfo.getLag();
+    }
+    
+    int lag = l1 + l2;
+    float co = (1 + (lag / synctime));
+    if (lcDebug)
+    {
+      snprintf(message, MessageLen, "sid: %d | pid :%d | co: %f",playerIndex, targetPlayer,co);
+sendMessage(ServerPlayer, targetPlayer, message);
+    }
+
+    firingInfo.shot.vel[0] = shot.vel[0] * co;
+    firingInfo.shot.vel[1] = shot.vel[1] * co;
+    firingInfo.shot.vel[2] = shot.vel[2] * co;
+    firingInfo.lifetime = firingInfo.lifetime / co;
+
+}
+
+}
+
+
 static void shotFired(int playerIndex, void *buf, int len)
 {
   GameKeeper::Player *playerData
@@ -3972,10 +4011,26 @@ static void shotFired(int playerIndex, void *buf, int len)
     playerData->player.endShotCredit--;
 
   ShotManager.AddShot(firingInfo,playerData->getIndex());
-
-  broadcastMessage(MsgShotBegin, len, buf);
+ bool enableLagCompensation = BZDB.isTrue("_enableLagCompensation");
+  if (enableLagCompensation)
+  {
+    for (int i = 0; i < curMaxPlayers; i++) {
+    compensateLag(playerIndex,i, firingInfo);
+    firingInfo.pack(buf);
+    // printf("%d", len);
+    // td::cout << printf("%d", len) << std::endl;
+    // std::cerr << len << std::endl;
+      directMessage(i, MsgShotBegin, len, buf);
+    }
+  
+  } else {
+    broadcastMessage(MsgShotBegin, len, buf);
+  }
+  // broadcastMessage(MsgShotBegin, len, buf);
 
 }
+
+
 
 static void shotEnded(const PlayerId& id, int16_t shotIndex, uint16_t reason)
 {

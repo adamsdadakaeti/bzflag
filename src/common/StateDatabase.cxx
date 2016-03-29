@@ -214,6 +214,7 @@ const std::string StateDatabase::BZDB_WINGSJUMPCOUNT       = std::string("_wings
 const std::string StateDatabase::BZDB_WINGSJUMPVELOCITY    = std::string("_wingsJumpVelocity");
 const std::string StateDatabase::BZDB_WINGSSLIDETIME       = std::string("_wingsSlideTime");
 const std::string StateDatabase::BZDB_WORLDSIZE		   = std::string("_worldSize");
+const std::string StateDatabase::BZDB_LAGCOMPENSATIONVAR   = std::string("_lagCompensationVar");
 
 //
 // StateDatabase::Item

@@ -53,13 +53,25 @@ static int fireWorldWepReal(FlagType* type, float lifetime, PlayerId player,
   firingInfo.shot.team = teamColor;
 
   buf = firingInfo.pack(bufStart);
-
+  ShotManager.AddShot(firingInfo,player);
   if (BZDB.isTrue(StateDatabase::BZDB_WEAPONS)) {
-    broadcastMessage(MsgShotBegin, (char *)buf - (char *)bufStart, bufStart);
+    bool enableLagCompensation = BZDB.isTrue("_enableLagCompensation");
+    if (enableLagCompensation)
+    {
+      for (int i = 0; i < curMaxPlayers; i++) {
+      compensateLag(player,i, firingInfo);
+      firingInfo.pack(buf);
+        directMessage(i, MsgShotBegin,(char *)buf - (char *)bufStart, buf);
+      }
+    
+    } else {
+      broadcastMessage(MsgShotBegin, (char *)buf - (char *)bufStart, buf);
+    }
+    // broadcastMessage(MsgShotBegin, (char *)buf - (char *)bufStart, bufStart);
   }
 
 
-  ShotManager.AddShot(firingInfo,player);
+  
   return shotID;
 }
 

@@ -180,7 +180,10 @@ const struct GlobalDBItem globalDBItems[] = {
   { "_wingsJumpCount",		"1",				false, StateDatabase::Locked},
   { "_wingsJumpVelocity",	"_jumpVelocity",		false, StateDatabase::Locked},
   { "_wingsSlideTime",		"0.0",				false, StateDatabase::Locked},
-  { "_worldSize",		"800.0",			false, StateDatabase::Locked}
+  { "_worldSize",		"800.0",			false, StateDatabase::Locked},
+  { "_enableLagCompensation",   "0",      false, StateDatabase::Locked},
+  { "_lagCompensationVar",   "5000.0",      false, StateDatabase::Locked},
+  { "_lagCompensationDebug",   "1",      false, StateDatabase::Locked}
 
 };
 const unsigned int	numGlobalDBItems = countof(globalDBItems);

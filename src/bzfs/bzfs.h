@@ -126,6 +126,7 @@ extern const std::string& getPublicOwner();
 extern void	       setPublicOwner(const std::string& owner);
 
 void rescanForBans ( bool isOperator = false, const char* callsign = NULL, int playerID = -1 );
+extern void compensateLag (int playerIndex, int targetPlayer, FiringInfo &firingInfo);
 
 // initialize permission groups
 extern void initGroups();
