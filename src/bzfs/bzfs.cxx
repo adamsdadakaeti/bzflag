@@ -3781,7 +3781,7 @@ void compensateLag(int playerIndex, int targetPlayer, FiringInfo &firingInfo) {
     } else {
       l2 = playerData->lagInfo.getLag();
     }
-    
+
     int lag = l1 + l2;
     float co = (1 + (lag / synctime));
     if (lcDebug)
@@ -4015,14 +4015,17 @@ static void shotFired(int playerIndex, void *buf, int len)
   if (enableLagCompensation)
   {
     for (int i = 0; i < curMaxPlayers; i++) {
-    compensateLag(playerIndex,i, firingInfo);
-    firingInfo.pack(buf);
+
     // printf("%d", len);
     // td::cout << printf("%d", len) << std::endl;
     // std::cerr << len << std::endl;
+    if (realPlayerWithNet(i)) {
+      compensateLag(playerIndex,i, firingInfo);
+      firingInfo.pack(buf);
       directMessage(i, MsgShotBegin, len, buf);
     }
-  
+    }
+
   } else {
     broadcastMessage(MsgShotBegin, len, buf);
   }
